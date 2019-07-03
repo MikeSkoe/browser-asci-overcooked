@@ -1,9 +1,11 @@
-const handleInput = (pub) => {
+import { Grid } from "../state";
+
+const handleInput = (pub, grid: Grid) => {
     const MOVE_RIGHT = pub(
         ['guy'], 
         state => {
             const newState = {...state};
-            newState.guy.x = Math.min(4, newState.guy.x + 1);
+            newState.guy.x = Math.min(grid.width - 1, newState.guy.x + 1);
             return newState;
         }
     );
@@ -19,7 +21,7 @@ const handleInput = (pub) => {
         ['guy'], 
         state => {
             const newState = {...state};
-            newState.guy.y = Math.min(4, newState.guy.y + 1);
+            newState.guy.y = Math.min(grid.height - 1, newState.guy.y + 1);
             return newState;
         }
     );

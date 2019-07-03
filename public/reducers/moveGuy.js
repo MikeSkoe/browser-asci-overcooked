@@ -1,7 +1,7 @@
-const handleInput = (pub) => {
+const handleInput = (pub, grid) => {
     const MOVE_RIGHT = pub(['guy'], state => {
         const newState = { ...state };
-        newState.guy.x = Math.min(4, newState.guy.x + 1);
+        newState.guy.x = Math.min(grid.width - 1, newState.guy.x + 1);
         return newState;
     });
     const MOVE_LEFT = pub(['guy'], state => {
@@ -11,7 +11,7 @@ const handleInput = (pub) => {
     });
     const MOVE_DOWN = pub(['guy'], state => {
         const newState = { ...state };
-        newState.guy.y = Math.min(4, newState.guy.y + 1);
+        newState.guy.y = Math.min(grid.height - 1, newState.guy.y + 1);
         return newState;
     });
     const MOVE_UP = pub(['guy'], state => {

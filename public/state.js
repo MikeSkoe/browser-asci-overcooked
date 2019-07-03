@@ -5,7 +5,7 @@ export var Entities;
     Entities[Entities["Guy"] = 7] = "Guy";
 })(Entities || (Entities = {}));
 const initialState = {
-    cellData: {
+    grid: {
         width: 5,
         height: 5,
     },

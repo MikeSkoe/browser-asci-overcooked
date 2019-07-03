@@ -6,7 +6,7 @@ import handleInput from './reducers/moveGuy.js';
 const {h, el, pub, sub} = init(initialState);
 
 const drawCell = draw(h);
-handleInput(pub);
+handleInput(pub, initialState.grid);
 
 const app = h('div', {},
 	h('h1', {}, 'test'),

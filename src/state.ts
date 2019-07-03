@@ -6,17 +6,15 @@ export enum Entities {
 
 export type Cell = number[][];
 export type Guy = {x: number, y: number};
+export type Grid = {width: number, height: number};
 export interface State {
 	cell: Cell;
     guy: Guy;
-    cellData: {
-        width: number;
-        height: number;
-    }
+    grid: Grid;
 }
 
 const initialState: State = {
-    cellData: {
+    grid: {
         width: 5,
         height: 5,
     },

@@ -8,8 +8,8 @@ const convertToChars = (n) => {
         default: return '.';
     }
 };
-const draw = h => (cell, guy) => {
-    const modify = pipe(withGuy(guy));
+const draw = h => (cell, guy, grid) => {
+    const modify = pipe(withGuy(guy, grid));
     return h('div', {}, ...modify(cell).map(nums => h('div', {}, h('span', {}, nums.map(convertToChars).join('')))));
 };
 export default draw;
