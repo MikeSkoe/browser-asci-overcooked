@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "preserveConstEnums": true,
+    "outDir": "public",
+    "sourceMap": true,
+    "target": "esnext"
+  },
+  "include": [
+    "src/**/*"
+  ]
+}
