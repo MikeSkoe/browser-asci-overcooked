@@ -1,6 +1,6 @@
 import { pipe } from "../help/utils.js";
-import withGuy from "../components/withGuy.js";
-import { Entities, Guy, Cell, Grid } from "../state.js";
+import withGuy from "./drawGuy.js";
+import { Entities, Guy, Cell } from "../state.js";
 
 const convertToChars = (n: number) => {
     switch (n) {
@@ -13,9 +13,8 @@ const convertToChars = (n: number) => {
 const draw = h => (
 	cell: Cell, 
     guy: Guy,
-    grid: Grid,
 ) => {
-    const modify = pipe<Cell>(withGuy(guy, grid))
+    const modify = pipe<Cell>(withGuy(guy))
 
 	return h('div', {},
 		...modify(cell).map(nums => h('div', {},
