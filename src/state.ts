@@ -1,28 +1,65 @@
-export enum Entities {
-    Floor,
-    Wall,
-    Guy = 7,
+import { makeId } from './help/utils.js';
+
+export enum Entity {
+	Floor = '.',
+	Wall = '#',
+	Guy = '@',
+	Meet = '0',
 }
 
-export type Cell = number[][];
-export type Guy = {x: number, y: number};
+export enum Color {
+	Black = 'b',
+	White = 'w',
+}
+
+export type Item = Entity.Meet;
+export type Decore = Entity.Floor | Entity.Wall | Entity.Guy;
+
+export enum Interaction {
+	None,
+	Take,
+}
+
+export type Cell = Entity[][];
+export interface Guy {
+	x: number, 
+	y: number, 
+	interaction: Interaction,
+	inHand: [string] | [],
+};
+export interface Thing {
+	x: number,
+	y: number,
+	is: Item,
+	id: string,
+}
 export interface State {
 	cell: Cell;
     guy: Guy;
+	items: Thing[];
 }
+
+const F = `${Entity.Floor}${Color.White}` as Entity;
+const W = `${Entity.Wall}${Color.Black}` as Entity;
 
 const initialState: State = {
 	cell: [
-		[1,0,0,0,1],
-		[0,1,0,0,0],
-		[0,0,0,0,0],
-		[0,0,0,1,0],
-		[0,1,0,0,1],
+		[W,F,F,F,W],
+		[F,W,F,F,F],
+		[F,F,F,F,F],
+		[F,F,F,W,F],
+		[F,W,F,F,W],
 	],
 	guy: {
 		x: 2,
 		y: 0,
-	}
+		interaction: Interaction.None,
+		inHand: [],
+	},
+	items: [
+		{x: 2, y: 3, is: Entity.Meet, id: makeId()},
+		{x: 3, y: 3, is: Entity.Meet, id: makeId()},
+	],
 };
 
 export default initialState;

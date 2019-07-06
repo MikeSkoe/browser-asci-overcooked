@@ -1,16 +1,14 @@
-import { pipe } from "../help/utils.js";
-import withGuy from "../components/withGuy.js";
-import { Entities } from "../state.js";
-const convertToChars = (n) => {
-    switch (n) {
-        case Entities.Wall: return '#';
-        case Entities.Guy: return '@';
-        default: return '.';
-    }
-};
-const draw = h => (cell, guy, grid) => {
-    const modify = pipe(withGuy(guy, grid));
-    return h('div', {}, ...modify(cell).map(nums => h('div', {}, h('span', {}, nums.map(convertToChars).join('')))));
-};
-export default draw;
+import { h } from '../help/lib.js';
+import { pipe } from '../help/utils.js';
+import withGuy from './withGuy.js';
+import withItems from './withItems.js';
+const drawCell = (el) => el((cell, guy, items) => {
+    const allIn = pipe(withItems(items, guy), withGuy(guy));
+    return h('div', {}, ...allIn(cell)
+        .map(entities => h('div', {}, ...entities.map(entity => {
+        const [e, className] = entity;
+        return h('span', { className }, e);
+    }))));
+});
+export default drawCell;
 //# sourceMappingURL=cell.js.map

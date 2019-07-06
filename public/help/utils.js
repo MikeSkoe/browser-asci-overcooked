@@ -7,4 +7,6 @@ export const d2 = (arr, size) => arr.reduce((acc, curr, index) => {
     return acc;
 }, []);
 export const concat = (above) => (under) => under.map((item, index) => above.flat()[index] || item);
+export const makeId = () => Math.random().toString(36).substr(2, 9);
+export const minMax = (min, max) => (n) => Math.max(min, Math.min(max, n));
 //# sourceMappingURL=utils.js.map

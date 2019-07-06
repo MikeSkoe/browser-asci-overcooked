@@ -12,7 +12,7 @@ export type Pub = (keys: string[], fn: AnyFn) => () => void;
 export type FromGetState = (value?: any) => any | undefined;
 export type GetState = (init?: {}) => (value?: any) => any | undefined;
 export type MakePubSub = (callbacks: {}, state: GetState) => {sub: Sub, pub: Pub};
-export type lifeCycle = {
+export type LifeCycle = {
 	onCreate?: (...args: any[]) => void, 
 	onUpdate?: (...args: any[]) => void,
 	onRemove?: (...args: any[]) => void,
@@ -31,13 +31,14 @@ const options = {
 	'object': (obj: El, el: El) => el.appendChild(obj),
 	'string': (str: string, el: El) => options['object'](t(str), el),
 };
+const copyObject = (obj: {}) => JSON.parse(JSON.stringify(obj));
 
 export const mount = (el: El, selector: string) => q(selector).appendChild(el);
 
-const h = (
+export const h = (
 	name: string, 
-	attrs: {style?: {}} = {}, 
-	...children: El[]
+	attrs: {style?: {}, className?: string} = {}, 
+	...children: (El | string)[]
 ) => {
 	const {style, ...restAttrs} = attrs;
 	const el = Object.assign(
@@ -68,7 +69,8 @@ const initPubSub = (callbacks: {}, state: GetState) => ({
 		state(fn(state()));
 		keys.forEach(key => {
 			(callbacks[key] || []).forEach(fn => {
-				fn(...(fn.args || []).map(arg => state(arg)))
+				fn(...(fn.args || [])
+					.map(arg => state(arg)))
 			})
 		});
 	}
@@ -81,24 +83,32 @@ const text = (state: GetState, sub: Sub) => (fn: AnyFn) => {
 	return textNode;
 };
 
-const el = (state: GetState, sub: Sub) => (
+const defaultShouldUpdate = (pV, nV) => {
+	const prev = JSON.stringify(pV);
+	const n = JSON.stringify(nV);
+	return JSON.stringify(pV) !== JSON.stringify(nV)
+};
+
+type MakeEl = (state: GetState, sub: Sub) => ElFn;
+export type ElFn = (fn: AnyFn, lifeCycle?: LifeCycle) => El;
+const el: MakeEl = (state: GetState, sub: Sub) => (
 	fn: AnyFn, 
-	lifeCycle: lifeCycle = {}
+	lifeCycle: LifeCycle = {shouldUpdate: defaultShouldUpdate},
 ) => {
 	const fnArgs = getArgs(fn);
-	lifeCycle.onCreate && lifeCycle.onCreate(...getArgs(lifeCycle.onCreate).map(arg => state()[arg]));
-	let currEl = fn(...fnArgs.map(arg => state()[arg]));
-	let prevVals = fnArgs.map(arg => state()[arg]);
+	lifeCycle.onCreate && lifeCycle.onCreate(...getArgs(lifeCycle.onCreate).map(arg => state(arg)));
+	let currEl = fn(...fnArgs.map(arg => state(arg)));
+	let prevVals = fnArgs.map(arg => state(arg));
 	const subscription = (...stVals) => {
 		if ( !lifeCycle.shouldUpdate 
-			|| lifeCycle.shouldUpdate && lifeCycle.shouldUpdate(stVals, prevVals)
+			|| lifeCycle.shouldUpdate && lifeCycle.shouldUpdate(prevVals, stVals)
 		) {
 			const newEl = fn(...stVals);
 			currEl.replaceWith(newEl);
 			currEl = newEl;
 			lifeCycle.onUpdate && lifeCycle.onUpdate(...getArgs(lifeCycle.onUpdate).map(arg => state(arg)));
 		}
-		prevVals = stVals;
+		prevVals = [...stVals];
 	};
 	const unsub = sub(fnArgs, subscription);
 	currEl.del = () => {
@@ -111,10 +121,10 @@ const el = (state: GetState, sub: Sub) => (
 
 const getSetState: GetState = (initialState: {}) => (value?: string) => {
 	return !value
-		? initialState
-		: typeof value === 'string'
-			? camelToDot(value).reduce((acc, cur) => acc[cur], initialState)
-			: initialState = value
+		? copyObject(initialState)
+			: typeof value === 'string'
+			? camelToDot(value).reduce((acc, cur) => acc[cur], copyObject(initialState))
+				: initialState = copyObject(value)
 }
 
 const map = (state: GetState, sub: Sub) => 

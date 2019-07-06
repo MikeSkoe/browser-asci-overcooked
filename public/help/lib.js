@@ -2,58 +2,68 @@ export const docFn = str => document[str].bind(document), q = docFn('querySelect
 const insertAfter = (oldEl, newEl) => oldEl.parentNode.insertBefore(newEl, oldEl.nextSibling);
 const camelToDot = (str) => str.split('_');
 const getArgs = (fn) => ('' + fn).match(/(\(|^)(?<a>.+?)[=\)]/).groups['a'].trim().split(', ');
-const notIn = (arr) => item => !arr.some(i => i.key === item.key);
+const notIn = (arr) => (item) => !arr.some(i => i.key === item.key);
 const getIn = (arr, key) => arr.find(i => i.key === key);
 const options = {
     'object': (obj, el) => el.appendChild(obj),
     'string': (str, el) => options['object'](t(str), el),
 };
+const copyObject = (obj) => JSON.parse(JSON.stringify(obj));
 export const mount = (el, selector) => q(selector).appendChild(el);
-const h = (state, sub) => (name, attrs = {}, ...children) => {
+export const h = (name, attrs = {}, ...children) => {
     const { style, ...restAttrs } = attrs;
     const el = Object.assign(c(name), restAttrs);
     Object.assign(el.style, style);
     children.forEach(child => options[(typeof child)](child, el));
     return el;
 };
-const sub = callbacks => (keys, fn, unsub = false) => {
-    fn.args = keys;
-    keys.forEach(key => {
-        callbacks[key] = callbacks[key] || [];
-        unsub
-            ? callbacks[key] = callbacks[key].filter(f => f !== fn)
-            : callbacks[key].push(fn);
-    });
-    return () => sub(callbacks)(keys, fn, true);
-};
-const pub = (callbacks, state) => (keys, fn) => () => {
-    state(fn(state()));
-    keys.forEach(key => {
-        (callbacks[key] || []).forEach(fn => {
-            fn(...(fn.args || []).map(arg => state(arg)));
+const initPubSub = (callbacks, state) => ({
+    sub: (keys, fn, unsub = false) => {
+        fn.args = keys;
+        const unsubscribe = () => keys.forEach(key => callbacks[key] = callbacks[key].filter(f => f !== fn));
+        keys.forEach(key => {
+            callbacks[key] = callbacks[key] || [];
+            unsub
+                ? unsubscribe()
+                : callbacks[key].push(fn);
         });
-    });
-};
-const text = (state, sub) => fn => {
+        return unsubscribe;
+    },
+    pub: (keys, fn) => () => {
+        state(fn(state()));
+        keys.forEach(key => {
+            (callbacks[key] || []).forEach(fn => {
+                fn(...(fn.args || [])
+                    .map(arg => state(arg)));
+            });
+        });
+    }
+});
+const text = (state, sub) => (fn) => {
     const fnArgs = getArgs(fn);
     const textNode = t(fn(...fnArgs.map(arg => state(arg))));
     sub(fnArgs, (...stVals) => textNode.data = fn(...stVals));
     return textNode;
 };
-const el = (state, sub) => (fn, lifeCycle = {}) => {
+const defaultShouldUpdate = (pV, nV) => {
+    const prev = JSON.stringify(pV);
+    const n = JSON.stringify(nV);
+    return JSON.stringify(pV) !== JSON.stringify(nV);
+};
+const el = (state, sub) => (fn, lifeCycle = { shouldUpdate: defaultShouldUpdate }) => {
     const fnArgs = getArgs(fn);
-    lifeCycle.onCreate && lifeCycle.onCreate(...getArgs(lifeCycle.onCreate).map(arg => state()[arg]));
-    let currEl = fn(...fnArgs.map(arg => state()[arg]));
-    let prevVals = fnArgs.map(arg => state()[arg]);
+    lifeCycle.onCreate && lifeCycle.onCreate(...getArgs(lifeCycle.onCreate).map(arg => state(arg)));
+    let currEl = fn(...fnArgs.map(arg => state(arg)));
+    let prevVals = fnArgs.map(arg => state(arg));
     const subscription = (...stVals) => {
         if (!lifeCycle.shouldUpdate
-            || lifeCycle.shouldUpdate && lifeCycle.shouldUpdate(stVals, prevVals)) {
+            || lifeCycle.shouldUpdate && lifeCycle.shouldUpdate(prevVals, stVals)) {
             const newEl = fn(...stVals);
             currEl.replaceWith(newEl);
             currEl = newEl;
             lifeCycle.onUpdate && lifeCycle.onUpdate(...getArgs(lifeCycle.onUpdate).map(arg => state(arg)));
         }
-        prevVals = stVals;
+        prevVals = [...stVals];
     };
     const unsub = sub(fnArgs, subscription);
     currEl.del = () => {
@@ -63,12 +73,12 @@ const el = (state, sub) => (fn, lifeCycle = {}) => {
     };
     return currEl;
 };
-const getSetState = initialState => value => {
+const getSetState = (initialState) => (value) => {
     return !value
-        ? initialState
+        ? copyObject(initialState)
         : typeof value === 'string'
-            ? camelToDot(value).reduce((acc, cur) => acc[cur], initialState)
-            : initialState = value;
+            ? camelToDot(value).reduce((acc, cur) => acc[cur], copyObject(initialState))
+            : initialState = copyObject(value);
 };
 const map = (state, sub) => (fn, shouldUpdate = (pV, nV) => JSON.stringify(pV) !== JSON.stringify(nV)) => {
     const [fnArg] = getArgs(fn);
@@ -114,14 +124,14 @@ const map = (state, sub) => (fn, shouldUpdate = (pV, nV) => JSON.stringify(pV) !
 const init = (initialState) => {
     const state = getSetState(initialState);
     const callbacks = {};
-    const lSub = sub(callbacks);
+    const { pub, sub } = initPubSub(callbacks, state);
     return {
-        sub: lSub,
-        pub: pub(callbacks, state),
-        text: text(state, lSub),
-        el: el(state, lSub),
-        map: map(state, lSub),
-        h: h(state, lSub),
+        sub,
+        pub,
+        text: text(state, sub),
+        el: el(state, sub),
+        map: map(state, sub),
+        h,
     };
 };
 export default init;
