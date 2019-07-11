@@ -1,3 +1,5 @@
+import { Entity } from '../state.js';
+
 export const pipe = 
 	<A>(...fns: ((a: A) => A)[]) => 
 		(arg: A): A => 
@@ -15,3 +17,8 @@ export const concat = <A>(above: A[]) => (under: A[]) => under.map((item, index)
 
 export const makeId = () => Math.random().toString(36).substr(2, 9);
 export const minMax = (min: number, max: number) => (n: number) => Math.max(min, Math.min(max, n))
+export const entityToStr = (e: Entity): string => {
+   switch (e) {
+      case Entity.Meet: return 'meet';
+   }
+}

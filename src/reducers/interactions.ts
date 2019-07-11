@@ -1,4 +1,4 @@
-import { minMax } from '../help/utils.js';
+import { minMax, entityToStr } from '../help/utils.js';
 import { Interaction, State, Entity, Msg, Color, OneToFive } from "../state.js";
 import { getEntity } from './actions.js';
 import mkMsg from './mkMsg.js';
@@ -17,9 +17,8 @@ export const onTake = (state: State, newPos: [number, number]) => {
 		state.guy.inHand = [];
 		const dropped = state.items.find(i => i.id === inHand);
       if (dropped.x === state.guy.x && dropped.y === state.guy.y) {
-         console.log('msgs', state.msgs);
-         state.msgs = [mkMsg(Msg.FoodOnFloor, 'foooddd')];
-         console.log('msgs', state.msgs);
+         const dropped = state.items.find(i => i.x === state.guy.x && i.y === state.guy.y).is;
+         state.msgs.push(mkMsg(Msg.FoodOnFloor, entityToStr(dropped)));
       }
    } else {
       const [entity, itemId] = getEntity(state.items, state.cell, newPos);
@@ -38,10 +37,10 @@ export const onCut = (state: State, newPos: [number, number]) => {
       state.items = state.items.map(
          item => {
             if (item.id === itemId) {
-               //state.msgs.push(mkMsg(Msg.CuttedWith, item.is, item.cutted + 1));
+	    state.msgs.push(mkMsg(Msg.CuttedWith, entityToStr(item.is), `${(item.cutted + 1) * 20}`))
                return {...item, cutted: Math.min(5, item.cutted + 1) as OneToFive} 
             } else {
-               item
+               return item
             }
          }
       );
