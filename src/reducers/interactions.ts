@@ -3,37 +3,45 @@ import { Interaction, State, Entity, Msg, Color, OneToFive } from "../state.js";
 import { getEntity } from './actions.js';
 import mkMsg from './mkMsg.js';
 
+const pull = (state: State, newPos: [number, number]) => {
+   const item = state.items.find(i => i.x === newPos[0] && i.y === newPos[1]);
+   state.items = state.items.map(
+      i => i.x === newPos[0] && i.y === newPos[1]
+         ? {...i, x: -1, y: -1}
+         : i
+   );
+   if (item) {
+      state.guy.inHand = [item.id];
+   }
+   state.guy.interaction = Interaction.None;
+};
+
+const drop = (state: State, newPos: [number, number]) => {
+   const item = state.items.find(i => i.x === newPos[0] && i.y === newPos[1]);
+   if (!item) {
+      const cropH = minMax(0, state.cell[0].length - 1);
+      const cropV = minMax(0, state.cell.length - 1);
+      const [inHand] = state.guy.inHand;
+      state.items = state.items.map(item => 
+         item.id === inHand
+            ? {...item, x: cropH(newPos[0]), y: cropV(newPos[1])}
+            : item
+      );
+      state.guy.inHand = [];
+      const dropped = state.items.find(i => i.id === inHand);
+      if (dropped.x === state.guy.x && dropped.y === state.guy.y) {
+         const dropped = state.items.find(i => i.x === state.guy.x && i.y === state.guy.y).is;
+         state.msgs.push(mkMsg(Msg.FoodOnFloor, entityToStr(dropped)));
+      }
+   }
+}
+
 export const onTake = (state: State, newPos: [number, number]) => {
 	state.guy.interaction = Interaction.None;
 	if (state.guy.inHand.length > 0) {
-      const item = state.items.find(i => i.x === newPos[0] && i.y === newPos[1]);
-      if (!item) {
-         const cropH = minMax(0, state.cell[0].length - 1);
-         const cropV = minMax(0, state.cell.length - 1);
-         const [inHand] = state.guy.inHand;
-         state.items = state.items.map(item => 
-            item.id === inHand
-               ? {...item, x: cropH(newPos[0]), y: cropV(newPos[1])}
-               : item
-         );
-         state.guy.inHand = [];
-         const dropped = state.items.find(i => i.id === inHand);
-         if (dropped.x === state.guy.x && dropped.y === state.guy.y) {
-            const dropped = state.items.find(i => i.x === state.guy.x && i.y === state.guy.y).is;
-            state.msgs.push(mkMsg(Msg.FoodOnFloor, entityToStr(dropped)));
-         }
-      }
+      drop(state, newPos);
    } else {
-      const item = state.items.find(i => i.x === newPos[0] && i.y === newPos[1]);
-      state.items = state.items.map(
-         i => i.x === newPos[0] && i.y === newPos[1]
-            ? {...i, x: -1, y: -1}
-            : i
-      );
-      if (item) {
-         state.guy.inHand = [item.id];
-      }
-      state.guy.interaction = Interaction.None;
+      pull(state, newPos);
    }
    return state;
 }
