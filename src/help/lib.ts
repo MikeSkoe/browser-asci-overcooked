@@ -18,6 +18,11 @@ export type LifeCycle = {
 	onRemove?: (...args: any[]) => void,
 	shouldUpdate?: (...args: any[]) => void,
 }
+export type HFn = (
+	name: string,
+	attrs: {style?: {}, className?: string},
+	...children: (El | string)[]
+) => El;
 
 const insertAfter = (
 	oldEl: El, 
@@ -35,7 +40,7 @@ const copyObject = (obj: {}) => JSON.parse(JSON.stringify(obj));
 
 export const mount = (el: El, selector: string) => q(selector).appendChild(el);
 
-export const h = (
+export const h: HFn = (
 	name: string, 
 	attrs: {style?: {}, className?: string} = {}, 
 	...children: (El | string)[]

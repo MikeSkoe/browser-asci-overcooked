@@ -1,13 +1,8 @@
-import { minMax } from '../help/utils.js';
-import { Interaction, State, Entity, Guy, Thing, Cell } from "../state.js";
+import { Interaction, State, Entity, Guy, Thing, Cell, Msg } from "../state.js";
+import { isWalkable } from './check.js';
+import { onTake, onCut } from './interactions.js';
 
-const isWalkable = (entity: Entity) => 
-	entity === Entity.Floor
-	|| entity === Entity.Meet
-const isActable = (entity: Entity) => entity === Entity.Meet;
-export const isInteracting = (guy: Guy) => guy.interaction !== Interaction.None;
-
-const getEntity = (
+export const getEntity = (
 	items: Thing[], 
 	cell: Cell, 
 	[x, y]: [number, number]
@@ -19,7 +14,7 @@ const getEntity = (
 	try {
 		entity = cell[y][x];
 	} catch {
-		entity = Entity.Wall;
+		entity = Entity.Table;
 	}
 	return [entity, item ? item.id : undefined];
 }
@@ -42,33 +37,9 @@ export const walkTo = (state: State, offset: [number, number]) => {
 }
 export const actTo = (state: State, offset: [number, number]) => {
 	const newPos = newGuyPos(state.guy, offset);
-	console.log('state', state);
 	switch (state.guy.interaction) {
-		case Interaction.Take: {
-			state.guy.interaction = Interaction.None;
-			if (state.guy.inHand.length > 0) {
-				const cropH = minMax(0, state.cell[0].length - 1);
-				const cropV = minMax(0, state.cell.length - 1);
-				const [inHand] = state.guy.inHand;
-				state.items = state.items.map(item => 
-					item.id === inHand
-						? {...item, x: cropH(newPos[0]), y: cropV(newPos[1])}
-						: item
-				);
-				state.guy.inHand = [];
-				const dropped = state.items.find(i => i.id === inHand);
-				if (dropped.x === state.guy.x && dropped.y === state.guy.y) {
-					state.msgs.push('TXT');
-				}
-				return state;
-			}
-			const [entity, itemId] = getEntity(state.items, state.cell, newPos);
-			if (itemId) {
-				state.guy.inHand = [itemId];
-			}
-			state.guy.interaction = Interaction.None;
-		}
+		case Interaction.Take: return onTake(state, newPos);
+      case Interaction.Cut: return onCut(state, newPos);
 	}
-	return state;
 }
 

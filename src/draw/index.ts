@@ -1,13 +1,8 @@
 import { Entity, Cell, Guy } from '../state.js';
 import { h, ElFn } from '../help/lib.js';
 import drawCell from './cell/index.js';
+import drawMsgs from './msgs/index.js';
 import drawInventory from './inventory.js';
-
-const drawMsgs = (el: ElFn) => 
-	el((msgs: string[]) => h('div', {}, 
-		`msgs: ${msgs.join('; ')}`,
-		...msgs.map(msg => h('div', {}, msg))
-	));
 
 const draw = (
 	el: ElFn
