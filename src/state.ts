@@ -19,7 +19,7 @@ export interface State {
   items: Thing[];
   msgs: string[];
 }
-export type Cell = Entity[][];
+export type Cell = ([Color, Entity | string])[][];
 export interface Guy {
   x: number, 
   y: number, 
@@ -45,16 +45,16 @@ export enum Interaction {
    Cut,
 }
 
-const F = `${Entity.Floor}${Color.White}` as Entity;
-const W = `${Entity.Table}${Color.Black}` as Entity;
-const G = `${Entity.Table}${Color.Gray}` as Entity;
+const W: [Color, Entity] = [Color.White, Entity.Floor];
+const G: [Color, Entity] = [Color.Gray, Entity.Table];
+const B: [Color, Entity] = [Color.Black, Entity.Table];
 const initialState: State = {
   cell: [ 
-    [W,F,F,F,W],
-    [F,G,F,F,F],
-    [F,F,F,F,F],
-    [F,F,F,G,F],
-    [F,W,F,F,W],
+    [B,W,W,W,B],
+    [W,G,W,W,W],
+    [W,W,W,W,W],
+    [W,W,W,G,W],
+    [W,B,W,W,B],
   ],
   guy: {
     x: 2,

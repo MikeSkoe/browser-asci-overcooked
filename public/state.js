@@ -24,16 +24,16 @@ export var Interaction;
     Interaction[Interaction["Take"] = 1] = "Take";
     Interaction[Interaction["Cut"] = 2] = "Cut";
 })(Interaction || (Interaction = {}));
-const F = `${Entity.Floor}${Color.White}`;
-const W = `${Entity.Table}${Color.Black}`;
-const G = `${Entity.Table}${Color.Gray}`;
+const W = [Color.White, Entity.Floor];
+const G = [Color.Gray, Entity.Table];
+const B = [Color.Black, Entity.Table];
 const initialState = {
     cell: [
-        [W, F, F, F, W],
-        [F, G, F, F, F],
-        [F, F, F, F, F],
-        [F, F, F, G, F],
-        [F, W, F, F, W],
+        [B, W, W, W, B],
+        [W, G, W, W, W],
+        [W, W, W, W, W],
+        [W, W, W, G, W],
+        [W, B, W, W, B],
     ],
     guy: {
         x: 2,
