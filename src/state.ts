@@ -5,8 +5,9 @@ export enum Entity {
    Table = '#',
    Guy = '@',
    Meet = '0',
+   Bun = 'B',
 }
-export type Item = Entity.Meet;
+export type Item = Entity.Meet | Entity.Bun;
 export type Decore = Entity.Floor | Entity.Table | Entity.Guy;
 export enum Msg {
 	FoodOnFloor,
@@ -14,12 +15,12 @@ export enum Msg {
 }
 
 export interface State {
-  cell: Cell;
+  grid: Grid;
   guy: Guy;
   items: Thing[];
   msgs: string[];
 }
-export type Cell = ([Color, Entity | string])[][];
+export type Grid = Color[][];
 export interface Guy {
   x: number, 
   y: number, 
@@ -27,12 +28,15 @@ export interface Guy {
   inHand: [string] | [],
 };
 export type OneToFive = 1 | 2 | 3 | 4 | 5;
+export interface Composable {
+   entity: Item,
+   cutted: OneToFive,
+}
 export interface Thing {
    x: number,
    y: number,
-   is: Item,
    id: string,
-   cutted: OneToFive,
+   is: Composable[],
 }
 export enum Color {
   Black = 'b',
@@ -45,11 +49,11 @@ export enum Interaction {
    Cut,
 }
 
-const W: [Color, Entity] = [Color.White, Entity.Floor];
-const G: [Color, Entity] = [Color.Gray, Entity.Table];
-const B: [Color, Entity] = [Color.Black, Entity.Table];
+const W: Color = Color.White;
+const G: Color = Color.Gray;
+const B: Color = Color.Black;
 const initialState: State = {
-  cell: [ 
+  grid: [ 
     [B,W,W,W,B],
     [W,G,W,W,W],
     [W,W,W,W,W],
@@ -63,8 +67,15 @@ const initialState: State = {
     inHand: [],
   },
   items: [
-    {x: 2, y: 3, is: Entity.Meet, id: makeId(), cutted: 1},
-    {x: 3, y: 3, is: Entity.Meet, id: makeId(), cutted: 1},
+     {id: makeId(), x: 2, y: 3, is: [
+        { entity: Entity.Meet, cutted: 1 },
+     ]},
+     {id: makeId(), x: 3, y: 3, is: [
+        { entity: Entity.Bun, cutted: 1 },
+     ]},
+     {id: makeId(), x: 4, y: 4, is: [
+        { entity: Entity.Bun, cutted: 1 },
+     ]},
   ],
   msgs: [],
 };

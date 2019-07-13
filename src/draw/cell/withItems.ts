@@ -1,14 +1,14 @@
 import { minMax } from '../../help/utils.js';
-import { Guy, Cell, Entity, Thing } from '../../state.js';
+import { Guy, Grid, Entity, Thing } from '../../state.js';
 
-const withItems = (items: Thing[]) => (cell: Cell) => {
+const withItems = (items: Thing[]) => (grid: Grid) => {
    items.forEach(i => {
       if (i.x >= 0 && i.y >= 0) {
-         const [color] = cell[i.y][i.x]; 
-         cell[i.y][i.x] = [color, i.id];
+         const color = grid[i.y][i.x]; 
+         grid[i.y][i.x] = color;
       }
    });
-   return cell;
+   return grid;
 };
 
 

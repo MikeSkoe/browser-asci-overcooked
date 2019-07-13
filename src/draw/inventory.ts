@@ -8,10 +8,14 @@ const drawInventory = (
       const [item] = guy_inHand;
       let name: string;
       if (item) {
-         const is = items.find(i => i.id === item).is;
-         switch (is) {
-               case Entity.Meet: name = 'meet'; break;
-         }
+         name = items.find(i => i.id === item).is.map(
+            comp => {
+               switch (comp.entity) {
+                     case Entity.Meet: return 'meet'; break;
+                     case Entity.Bun: return 'bun'; break;
+               }
+            }
+         ).join(' + ');
       } else {
          name = 'nothing';
       }

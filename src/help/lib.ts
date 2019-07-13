@@ -5,7 +5,7 @@ export const docFn = str => document[str].bind(document),
 
 export type WithKey = {key: string};
 export type WithDel = {del?: () => void};
-export type El = HTMLElement & WithKey & WithDel;
+export type El = (HTMLElement | HTMLCanvasElement) & WithKey & WithDel;
 export type AnyFn = {(...args: any[]): any; args?: string[]};
 export type Sub = (keys: string[], fn: AnyFn, unsub?: boolean) => (() => void | undefined);
 export type Pub = (keys: string[], fn: AnyFn) => () => void;
@@ -18,11 +18,12 @@ export type LifeCycle = {
 	onRemove?: (...args: any[]) => void,
 	shouldUpdate?: (...args: any[]) => void,
 }
-export type HFn = (
+// TODO: El type to generic
+export type HFn = <T>(
 	name: string,
-	attrs: {style?: {}, className?: string},
-	...children: (El | string)[]
-) => El;
+	attrs: {style?: {}, className?: string, width?: number, height?: number},
+	...children: ((WithKey & WithDel) | HTMLCanvasElement | El | string)[]
+) => T & WithKey & WithDel;
 
 const insertAfter = (
 	oldEl: El, 
@@ -42,7 +43,7 @@ export const mount = (el: El, selector: string) => q(selector).appendChild(el);
 
 export const h: HFn = (
 	name: string, 
-	attrs: {style?: {}, className?: string} = {}, 
+	attrs = {}, 
 	...children: (El | string)[]
 ) => {
 	const {style, ...restAttrs} = attrs;
@@ -67,15 +68,30 @@ const initPubSub = (callbacks: {}, state: GetState) => ({
 				? unsubscribe()
 				: callbacks[key].push(fn);
 		});
+      // TODO: remove copypaste
+      [...keys, 'ALL'].forEach(key => {
+			(callbacks[key] || []).forEach(fn => {
+            if (key === 'ALL') {
+               fn(state());
+            } else {
+               fn(...(fn.args || [])
+                  .map(arg => state(arg)));
+            }
+			})
+		});
 		return unsubscribe;
 	},
 
 	pub: (keys: string[], fn: AnyFn) => () => {
 		state(fn(state()));
-		keys.forEach(key => {
+      [...keys, 'ALL'].forEach(key => {
 			(callbacks[key] || []).forEach(fn => {
-				fn(...(fn.args || [])
-					.map(arg => state(arg)))
+            if (key === 'ALL') {
+               fn(state());
+            } else {
+               fn(...(fn.args || [])
+                  .map(arg => state(arg)));
+            }
 			})
 		});
 	}
@@ -150,7 +166,7 @@ const map = (state: GetState, sub: Sub) =>
 
 		removedVals.forEach(
 			val => {
-				const deleted = getIn(items, val.key) as El;
+				const deleted = getIn(items, val.key) as El & WithDel & WithKey;
 				deleted.del ? deleted.del() : deleted.remove();
 			}
 		);
@@ -163,7 +179,7 @@ const map = (state: GetState, sub: Sub) =>
 					newItems.push(getIn(items, newVal.key));
 				} else {
 					const newItem = fn(newVal);
-					const oldItem = getIn(items, oldWithoutRemoved[index].key) as El; 
+					const oldItem = getIn(items, oldWithoutRemoved[index].key) as El & WithDel & WithKey; 
 					insertAfter(oldItem, newItem);
 					newItems.push(newItem);
 					oldItem.del ? oldItem.del() : oldItem.remove();

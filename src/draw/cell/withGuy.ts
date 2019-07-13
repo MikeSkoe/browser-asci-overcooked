@@ -1,10 +1,10 @@
 import { d2 } from '../../help/utils.js';
-import { Guy, Cell, Entity } from '../../state.js';
+import { Guy, Grid, Entity } from '../../state.js';
 
-const withGuy = (guy: Guy) => (cell: Cell) => {
-   const [color] = cell[guy.y][guy.x]; 
-   cell[guy.y][guy.x] = [color, Entity.Guy];
-   return cell;
+const withGuy = (guy: Guy) => (grid: Grid) => {
+   const color = grid[guy.y][guy.x]; 
+   grid[guy.y][guy.x] = color;
+   return grid;
 };
 
 
