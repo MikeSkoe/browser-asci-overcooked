@@ -1,4 +1,4 @@
-import { Entity, Grid, Guy, Thing, Color } from '../../state.js';
+import { Entity, Grid, Guy, Thing, Surface } from '../../state.js';
 import { h, ElFn } from '../../help/lib.js';
 import { pipe } from '../../help/utils.js';
 import withGuy from './withGuy.js';
@@ -14,11 +14,11 @@ const drawGrid = (el: ElFn) =>
       return h('div', {}, 
          ...allIn(grid).map(
             entities => h('div', {},
-               ...entities.map(([color, entity]) => {
+               ...entities.map(([surface, entity]) => {
                   const item = items.find(i => i.id === entity);
                   return h('span', 
                      {
-                        className: color,
+                        className: surface,
                         style: {
                            textDecoration: item && item.is.some(comp => comp.cutted === 5) 
                               ? 'line-through' 

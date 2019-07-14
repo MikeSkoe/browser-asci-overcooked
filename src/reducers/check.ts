@@ -1,7 +1,8 @@
-import { Entity, Guy, Interaction, Color } from '../state.js';
+import { Entity, Guy, Interaction, Surface } from '../state.js';
 
-export const isWalkable = (color: Color) => 
-   color === Color.White;
-export const isActable = (entity: Entity) => entity === Entity.Meet;
+export const isWalkable = (surface: Surface) => 
+   surface === Surface.Floor;
+export const isActable = (entity: Entity) => entity === Entity.Meat;
 export const isInteracting = (guy: Guy) => guy.interaction !== Interaction.None;
+export const isIntersacting = (aIs, bIs) => aIs.some(a => bIs.some(b => a.entity === b.entity));
 

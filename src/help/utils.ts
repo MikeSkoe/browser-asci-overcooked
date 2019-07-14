@@ -1,4 +1,4 @@
-import { Entity } from '../state.js';
+import { Entity, Composable } from '../state.js';
 
 export const pipe = 
 	<A>(...fns: ((a: A) => A)[]) => 
@@ -17,8 +17,12 @@ export const concat = <A>(above: A[]) => (under: A[]) => under.map((item, index)
 
 export const makeId = () => Math.random().toString(36).substr(2, 9);
 export const minMax = (min: number, max: number) => (n: number) => Math.max(min, Math.min(max, n))
-export const entityToStr = (e: Entity): string => {
-   switch (e) {
-      case Entity.Meet: return 'meet';
-   }
+
+const entityStrings = {
+   [Entity.Meat]: 'meat',
+   [Entity.Bun]: 'bun',
 }
+
+export const compToStr = (withData: boolean) => (comp: Composable): string => 
+   `${entityStrings[comp.entity]}${withData ? ` cutted:${comp.cutted} baked:${comp.baked}` : ``}`;
+

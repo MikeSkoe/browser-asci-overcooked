@@ -4,33 +4,35 @@ export enum Entity {
    Floor = '.',
    Table = '#',
    Guy = '@',
-   Meet = '0',
+   Meat = '0',
    Bun = 'B',
 }
-export type Item = Entity.Meet | Entity.Bun;
-export type Decore = Entity.Floor | Entity.Table | Entity.Guy;
+export type Item = Entity.Meat | Entity.Bun;
 export enum Msg {
 	FoodOnFloor,
    CuttedWith,
 }
 
 export interface State {
-  grid: Grid;
-  guy: Guy;
-  items: Thing[];
-  msgs: string[];
+   grid: Grid;
+   guy: Guy;
+   items: Thing[];
+   msgs: string[];
+   ready: Thing[];
+   need: Thing[];
 }
-export type Grid = Color[][];
+export type Grid = [Surface, Entity][][];
 export interface Guy {
-  x: number, 
-  y: number, 
-  interaction: Interaction,
-  inHand: [string] | [],
+   x: number, 
+   y: number, 
+   interaction: Interaction,
+   inHand: [string] | [],
 };
 export type OneToFive = 1 | 2 | 3 | 4 | 5;
 export interface Composable {
    entity: Item,
    cutted: OneToFive,
+   baked: OneToFive,
 }
 export interface Thing {
    x: number,
@@ -38,46 +40,68 @@ export interface Thing {
    id: string,
    is: Composable[],
 }
-export enum Color {
-  Black = 'b',
-  White = 'w',
-  Gray = 'g',
+export enum Surface {
+   Table = 'T',
+   Floor = 'F',
+   Cutting = 'C',
+   Stove = 'S',
+   Meats = 'M',
+   Buns = 'B',
+   Garbage = 'G',
+   Ready = 'R',
 }
 export enum Interaction {
    None,
    Take,
-   Cut,
+   Action,
 }
 
-const W: Color = Color.White;
-const G: Color = Color.Gray;
-const B: Color = Color.Black;
+const F: [Surface, Entity] = [Surface.Floor, Entity.Floor];
+const C: [Surface, Entity] = [Surface.Cutting, Entity.Table];
+const T: [Surface, Entity] = [Surface.Table, Entity.Table];
+const S: [Surface, Entity] = [Surface.Stove, Entity.Table];
+const M: [Surface, Entity] = [Surface.Meats, Entity.Table];
+const B: [Surface, Entity] = [Surface.Buns, Entity.Table];
+const G: [Surface, Entity] = [Surface.Garbage, Entity.Table];
+const D: [Surface, Entity] = [Surface.Ready, Entity.Table];
+
 const initialState: State = {
-  grid: [ 
-    [B,W,W,W,B],
-    [W,G,W,W,W],
-    [W,W,W,W,W],
-    [W,W,W,G,W],
-    [W,B,W,W,B],
-  ],
-  guy: {
-    x: 2,
-    y: 0,
-    interaction: Interaction.None,
-    inHand: [],
-  },
-  items: [
-     {id: makeId(), x: 2, y: 3, is: [
-        { entity: Entity.Meet, cutted: 1 },
-     ]},
-     {id: makeId(), x: 3, y: 3, is: [
-        { entity: Entity.Bun, cutted: 1 },
-     ]},
-     {id: makeId(), x: 4, y: 4, is: [
-        { entity: Entity.Bun, cutted: 1 },
-     ]},
-  ],
-  msgs: [],
+   grid: [ 
+      [T,F,F,F,D],
+      [C,F,F,F,F],
+      [S,F,F,F,F],
+      [M,F,F,F,F],
+      [B,F,F,F,F],
+      [G,F,F,F,F],
+   ],
+   guy: {
+      x: 2,
+      y: 0,
+      interaction: Interaction.None,
+      inHand: [],
+   },
+   items: [],
+   msgs: [],
+   ready: [],
+   need: [
+      {
+         x: -1,
+         y: -1,
+         id: 'asdf',
+         is: [
+            {
+               entity: Entity.Meat,
+               cutted: 1,
+               baked: 1,
+            },
+            {
+               entity: Entity.Bun,
+               cutted: 1,
+               baked: 1,
+            },
+         ]
+      }
+   ],
 };
 
 export default initialState;

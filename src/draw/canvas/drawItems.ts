@@ -8,36 +8,28 @@ interface DrawItem {
 type MakeDrawItem = (ctx: CanvasRenderingContext2D) => DrawItem;
 
 const drawItem: MakeDrawItem = (ctx: CanvasRenderingContext2D) => ({
-   [Entity.Meet]: (x, y, comp) => {
-      ctx.fillStyle =
-         comp.cutted === 5
-            ? `rgb(250, 250, 250)`
-            : `rgb(220, 220, 220)`;
+   [Entity.Meat]: (x, y, comp) => {
+      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
       ctx.fillRect(x * 20, y * 20, 10, 10);
    },
    [Entity.Bun]: (x, y, comp) => {
-      ctx.fillStyle =
-         comp.cutted === 5
-            ? `rgb(250, 50, 250)`
-            : `rgb(220, 20, 220)`;
+      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
       ctx.fillRect(x * 20 + 10, y * 20, 10, 10);
    },
    fallback: (x, y, comp) => {
-      ctx.fillStyle =
-         comp.cutted === 5
-            ? `rgb(250, 250, 250)`
-            : `rgb(220, 220, 220)`;
+      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
       ctx.fillRect(x * 20, y * 20 + 10, 10, 10);
    }
 });
 
-const drawItems = (ctx: CanvasRenderingContext2D) => (items: Thing[]) => {
+const drawItems = (items: Thing[]) => (ctx: CanvasRenderingContext2D) => {
    const draw = drawItem(ctx);
    items.forEach(item => {
       item.is.forEach((comp: Composable) => {
          (draw[comp.entity] || draw.fallback)(item.x, item.y, comp)
       });
    });
+   return ctx;
 }
 
 export default drawItems;
