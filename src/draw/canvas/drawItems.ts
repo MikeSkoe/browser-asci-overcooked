@@ -10,15 +10,15 @@ type MakeDrawItem = (ctx: CanvasRenderingContext2D) => DrawItem;
 const drawItem: MakeDrawItem = (ctx: CanvasRenderingContext2D) => ({
    [Entity.Meat]: (x, y, comp) => {
       ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 20, y * 20, 10, 10);
+      ctx.fillRect(x * 26, y * 26, 10, 10);
    },
    [Entity.Bun]: (x, y, comp) => {
       ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 20 + 10, y * 20, 10, 10);
+      ctx.fillRect(x * 26 + 10, y * 26, 10, 10);
    },
    fallback: (x, y, comp) => {
       ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 20, y * 20 + 10, 10, 10);
+      ctx.fillRect(x * 26, y * 26 + 10, 10, 10);
    }
 });
 

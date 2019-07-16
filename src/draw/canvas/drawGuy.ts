@@ -1,9 +1,10 @@
 import { Guy } from '../../state.js';
 
-const drawGuy = (guy: Guy) => (ctx: CanvasRenderingContext2D) => {
-   ctx.fillStyle = 'rgb(200, 0, 0)';
-   ctx.fillRect(guy.x * 20 + 3, guy.y * 20 + 3, 14, 14);
-   return ctx;
+const drawGuy = (drawTile, guy: Guy) => {
+   const drawGuy = drawTile(4, 1);
+   return (ctx: CanvasRenderingContext2D) => {
+      return drawGuy(ctx)(guy.x * 26, guy.y * 26, 26, 26);
+   }
 }
 
 export default drawGuy;
