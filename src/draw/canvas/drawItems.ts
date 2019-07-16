@@ -7,29 +7,34 @@ interface DrawItem {
 }
 type MakeDrawItem = (ctx: CanvasRenderingContext2D) => DrawItem;
 
-const drawItem: MakeDrawItem = (ctx: CanvasRenderingContext2D) => ({
-   [Entity.Meat]: (x, y, comp) => {
-      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 26, y * 26, 10, 10);
-   },
-   [Entity.Bun]: (x, y, comp) => {
-      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 26 + 10, y * 26, 10, 10);
-   },
-   fallback: (x, y, comp) => {
-      ctx.fillStyle = `rgb(${10 * (comp.baked * 5)}, ${10 * (comp.cutted * 5)}, ${100})`;
-      ctx.fillRect(x * 26, y * 26 + 10, 10, 10);
-   }
-});
+const drawItems = (drawTile, items: Thing[]) => {
+   const meat = drawTile(1, 0);
+   const bun = drawTile(0, 0);
+   const green = drawTile(1, 1);
 
-const drawItems = (items: Thing[]) => (ctx: CanvasRenderingContext2D) => {
-   const draw = drawItem(ctx);
-   items.forEach(item => {
-      item.is.forEach((comp: Composable) => {
-         (draw[comp.entity] || draw.fallback)(item.x, item.y, comp)
+   return (ctx: CanvasRenderingContext2D) => {
+      const drawMeat = meat(ctx);
+      const drawBun = bun(ctx);
+      const drawGreen = green(ctx);
+
+      items.forEach(item => {
+         item.is.forEach((comp: Composable, index: number) => {
+            const offset = item.is.length;
+            switch(comp.entity) {
+               case Entity.Meat: 
+                  drawMeat(item.x * 26, item.y * 26 + (offset / 2) - (index * offset) - 5, 26, 26); 
+                  break;
+               case Entity.Bun: 
+                  drawBun(item.x * 26, item.y * 26 + (offset / 2) - (index * offset) - 5, 26, 26); 
+                  break;
+               case Entity.Green: 
+                  drawGreen(item.x * 26, item.y * 26 + (offset / 2) - (index * offset) - 5, 26, 26); 
+                  break;
+            }
+         });
       });
-   });
-   return ctx;
+      return ctx;
+   }
 }
 
 export default drawItems;

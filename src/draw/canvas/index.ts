@@ -34,7 +34,7 @@ const drawTile = (x: number, y: number) =>
 const drawCanvas = (state: State) => {
    pipe(
       drawGrid(drawTile, state.grid),
-      drawItems(state.items),
+      drawItems(drawTile, state.items),
       drawGuy(drawTile, state.guy),
    )(ctx);
 }

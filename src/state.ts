@@ -1,13 +1,14 @@
 import { makeId } from './help/utils.js';
 
 export enum Entity {
-   Floor = '.',
-   Table = '#',
-   Guy = '@',
-   Meat = '0',
-   Bun = 'B',
+   Floor,
+   Table,
+   Guy,
+   Green,
+   Meat,
+   Bun,
 }
-export type Item = Entity.Meat | Entity.Bun;
+export type Item = Entity.Meat | Entity.Bun | Entity.Green;
 export enum Msg {
 	FoodOnFloor,
    CuttedWith,
@@ -80,7 +81,20 @@ const initialState: State = {
       interaction: Interaction.None,
       inHand: [],
    },
-   items: [],
+   items: [
+      {
+         x: 1,
+         y: 1,
+         id: 'asdf',
+         is: [
+            {
+               entity: Entity.Green,
+               cutted: 1,
+               baked: 1,
+            },
+         ]
+      }
+   ],
    msgs: [],
    ready: [],
    need: [
