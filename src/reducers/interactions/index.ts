@@ -40,6 +40,16 @@ export const onCut = (state: State, newPos: [number, number]) => {
    )(state);
 }
 
+export const onPlates = (state: State) => {
+   const [inHand] = state.guy.inHand;
+   return pipe(
+      uninteraction,
+      inHand
+         ? onNothing
+         : items.create(Entity.Plate),
+   )(state);
+}
+
 export const onBuns = (state: State) => {
    const [inHand] = state.guy.inHand;
    return pipe(
@@ -57,6 +67,16 @@ export const onMeats = (state: State) => {
       inHand
          ? onNothing
          : items.create(Entity.Meat),
+   )(state);
+}
+
+export const onGreens = (state: State) => {
+   const [inHand] = state.guy.inHand;
+   return pipe(
+      uninteraction,
+      inHand
+         ? onNothing
+         : items.create(Entity.Green),
    )(state);
 }
 

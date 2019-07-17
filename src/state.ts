@@ -1,6 +1,7 @@
 import { makeId } from './help/utils.js';
 
 export enum Entity {
+   Plate,
    Floor,
    Table,
    Guy,
@@ -8,7 +9,7 @@ export enum Entity {
    Meat,
    Bun,
 }
-export type Item = Entity.Meat | Entity.Bun | Entity.Green;
+export type Item = Entity.Meat | Entity.Bun | Entity.Green | Entity.Plate;
 export enum Msg {
 	FoodOnFloor,
    CuttedWith,
@@ -42,14 +43,16 @@ export interface Thing {
    is: Composable[],
 }
 export enum Surface {
-   Table = 'T',
-   Floor = 'F',
-   Cutting = 'C',
-   Stove = 'S',
-   Meats = 'M',
-   Buns = 'B',
-   Garbage = 'G',
-   Ready = 'R',
+   Table,
+   Floor,
+   Cutting,
+   Stove,
+   Meats,
+   Buns,
+   Garbage,
+   Ready,
+   Greens,
+   Plates,
 }
 export enum Interaction {
    None,
@@ -65,6 +68,8 @@ const M: [Surface, Entity] = [Surface.Meats, Entity.Table];
 const B: [Surface, Entity] = [Surface.Buns, Entity.Table];
 const G: [Surface, Entity] = [Surface.Garbage, Entity.Table];
 const D: [Surface, Entity] = [Surface.Ready, Entity.Table];
+const g: [Surface, Entity] = [Surface.Greens, Entity.Table];
+const P: [Surface, Entity] = [Surface.Plates, Entity.Table];
 
 const initialState: State = {
    grid: [ 
@@ -72,8 +77,8 @@ const initialState: State = {
       [C,F,F,F,F],
       [S,F,F,F,F],
       [M,F,F,F,F],
-      [B,F,F,F,F],
-      [G,F,F,F,F],
+      [B,F,F,F,P],
+      [G,F,F,F,g],
    ],
    guy: {
       x: 2,
@@ -81,20 +86,7 @@ const initialState: State = {
       interaction: Interaction.None,
       inHand: [],
    },
-   items: [
-      {
-         x: 1,
-         y: 1,
-         id: 'asdf',
-         is: [
-            {
-               entity: Entity.Green,
-               cutted: 1,
-               baked: 1,
-            },
-         ]
-      }
-   ],
+   items: [],
    msgs: [],
    ready: [],
    need: [

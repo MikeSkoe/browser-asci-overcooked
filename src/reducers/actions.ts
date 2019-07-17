@@ -1,7 +1,8 @@
 import { Surface, Interaction, State, Guy, Grid } from "../state.js";
 import { isWalkable } from './check.js';
 import { 
-   onGarbage, onTake, onCut, onStove, onBuns, onMeats, onReady, uninteraction 
+   onPlates, onGreens, onGarbage, onTake, onCut, onStove, 
+   onBuns, onMeats, onReady, uninteraction 
 } from './interactions/index.js';
 import { minMax } from '../help/utils.js';
 
@@ -51,7 +52,11 @@ export const actTo = (state: State, offset: [number, number]) => {
                      ? onGarbage(state)
                      : surface === Surface.Ready
                         ? onReady(state)
-                        : uninteraction(state);
+                        : surface == Surface.Greens
+                           ? onGreens(state)
+                           : surface === Surface.Plates
+                              ? onPlates(state)
+                              : uninteraction(state);
    }
 }
 

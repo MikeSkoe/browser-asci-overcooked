@@ -7,11 +7,11 @@ const {h, el, pub, sub} = init(initialState);
 
 handleInput(pub);
 
-const game = draw(el, sub);
+const game = draw(el, sub, pub);
 
 const app = h('div', {},
 	h('h1', {}, 'test'),
-	game as HTMLElement & WithKey & WithDel,
+	game,
 ) as El;
 
 mount(app, '#app');

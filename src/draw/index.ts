@@ -1,4 +1,4 @@
-import { h, ElFn, Sub } from '../help/lib.js';
+import { h, ElFn, Sub, Pub } from '../help/lib.js';
 import drawCell from './cell/index.js';
 import drawMsgs from './msgs/index.js';
 import drawInventory from './inventory.js';
@@ -9,8 +9,11 @@ import InitCanvas  from './canvas/index.js';
 const draw = (
    el: ElFn,
    sub: Sub,
+   pub: Pub,
 ) => {
-   const canvas = InitCanvas(sub);
+
+   const triggerAll = pub(['ALL'], state => state);
+   const canvas = InitCanvas(sub, triggerAll);
 
 	return h('div', {},
       canvas,

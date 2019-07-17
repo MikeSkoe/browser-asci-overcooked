@@ -21,6 +21,7 @@ export const minMax = (min: number, max: number) => (n: number) => Math.max(min,
 const entityStrings = {
    [Entity.Meat]: 'meat',
    [Entity.Bun]: 'bun',
+   [Entity.Green]: 'green',
 }
 
 export const compToStr = (withData: boolean) => (comp: Composable): string => 

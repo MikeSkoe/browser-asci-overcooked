@@ -5,17 +5,19 @@ import drawItems from './drawItems.js';
 import drawGrid from './drawGrid.js';
 import { pipe } from '../../help/utils.js';
 
-const canvas = <HTMLCanvasElement>h('canvas', {width: 26 * 5, height: 26 * 6});
+const canvas = <HTMLCanvasElement>h('canvas', {width: (26 * 2) * 5, height: (26 * 2) * 6});
 const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
 
 const tile = new Image();
 tile.src = 'assets/tilemap.png';
 
 const tileSize = 26;
+const cellSize = 26 * 2;
 
-const drawTile = (x: number, y: number) => 
-   (ctx: CanvasRenderingContext2D) => 
-   (tx: number, ty: number, tw: number, th: number) => 
+const drawTile = 
+   (x: number, y: number) => 
+   (ctx: CanvasRenderingContext2D, tx: number, ty: number) => 
 {
    ctx.drawImage(
       tile, // tile source
@@ -25,22 +27,31 @@ const drawTile = (x: number, y: number) =>
       tileSize, // tile size height
       tx, // target x
       ty, // target y
-      tw, // target width
-      th, // target height
+      cellSize, // target width
+      cellSize, // target height
    )
+   return ctx;
+}
+
+const drawBackground = (ctx: CanvasRenderingContext2D) => {
+   ctx.fillStyle = `rgb(150, 150, 150)`;
+   ctx.fillRect(0, 0, cellSize * 5, cellSize * 6);
    return ctx;
 }
 
 const drawCanvas = (state: State) => {
    pipe(
-      drawGrid(drawTile, state.grid),
-      drawItems(drawTile, state.items),
-      drawGuy(drawTile, state.guy),
+      drawBackground,
+      drawGrid(drawTile, state.grid, cellSize),
+      drawItems(drawTile, state.items, cellSize),
+      drawGuy(drawTile, state.guy, cellSize),
    )(ctx);
 }
 
-const init = (sub: Sub) => {
+const init = (sub: Sub, triggerAll) => {
    sub(['ALL'], drawCanvas);
+
+   tile.onload = triggerAll;
    return canvas;
 }
 
