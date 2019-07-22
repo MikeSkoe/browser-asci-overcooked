@@ -11,6 +11,7 @@ export const uninteraction = (state: State) => {
 export const onTake = (state: State, newPos: [number, number]) => {
    const item = state.items.find(i => i.x === newPos[0] && i.y === newPos[1]);
    const itemId = item ? item.id : undefined;
+   const targetSurface = state.grid[newPos[1]][newPos[0]];
    return pipe(
       uninteraction,
       state.guy.inHand.length > 0

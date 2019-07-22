@@ -1,4 +1,5 @@
 import { Entity, Thing, Composable } from '../../state.js';
+import { Color, Baked } from '../../state.js';
 
 type DrawFn = (x: number, y: number, comp: Composable) => void;
 interface DrawItem {
@@ -7,48 +8,216 @@ interface DrawItem {
 }
 type MakeDrawItem = (ctx: CanvasRenderingContext2D) => DrawItem;
 
-const drawItems = (drawTile, items: Thing[], cellSize: number) => {
-   const drawMeat = drawTile(1, 0);
-   const drawBun = drawTile(0, 0);
-   const drawGreen = drawTile(1, 1);
-   const drawPlate = drawTile(3, 1);
+const drawMeat = (
+   ctx: CanvasRenderingContext2D, 
+   x: number, 
+   y: number, 
+   cellSize: number, 
+   cutted: number,
+   baked: number,
+) => {
+   ctx.save();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+         ctx.strokeStyle = baked === 5
+            ? Baked.Meat
+            : Color.Meat;
+         if (cutted === 5) {
+            ctx.moveTo(x - cellSize/3, y);
+            ctx.lineTo(x - 2, y);
+            ctx.moveTo(x + 2, y);
+            ctx.lineTo(x + cellSize/3, y)
+         } else {
+            ctx.moveTo(x - cellSize/4, y);
+            ctx.lineTo(x + cellSize/4, y);
+         }
+         ctx.stroke();
+      ctx.closePath();
+   ctx.restore();
+}
 
+const drawCheez = (
+   ctx: CanvasRenderingContext2D, 
+   x: number, 
+   y: number, 
+   cellSize: number, 
+   cutted: number,
+   baked: number,
+) => {
+   ctx.save();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+         ctx.strokeStyle = baked === 5
+            ? Baked.Cheez
+            : Color.Cheez;
+         if (cutted === 5) {
+            ctx.moveTo(x - cellSize/4, y);
+            ctx.lineTo(x - (cellSize/4)/2, y + 3);
+            ctx.lineTo(x, y);
+            ctx.lineTo(x + (cellSize/4)/2, y + 3);
+            ctx.lineTo(x + cellSize/4, y);
+         } else {
+            ctx.moveTo(x - cellSize/4, y);
+            ctx.lineTo(x, y + 3);
+            ctx.lineTo(x + cellSize/4, y);
+         }
+         ctx.stroke();
+      ctx.closePath();
+   ctx.restore();
+}
+
+const drawBun = (
+   ctx: CanvasRenderingContext2D, 
+   x: number, 
+   y: number, 
+   cellSize: number, 
+   cutted: number,
+   count: number,
+   baked: number,
+) => {
+   ctx.save();
+      ctx.beginPath();
+         ctx.strokeStyle = baked === 5
+            ? Baked.Bun
+            : Color.Bun;
+         ctx.lineWidth = 2;
+         if (cutted === 5) {
+            ctx.arc(x, y, 10, 0, Math.PI, true);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.rect(x - 10, y + count * 5, 20, 5);
+         } else {
+            ctx.arc(x, y, 10, 0, Math.PI * 2, true);
+         }
+      ctx.closePath();
+      ctx.stroke();
+   ctx.restore();
+}
+
+const drawPlate = (
+   ctx: CanvasRenderingContext2D, 
+   x: number, 
+   y: number, 
+   cellSize: number, 
+   cutted: number,
+   baked: number,
+) => {
+   ctx.save();
+      ctx.beginPath();
+         ctx.fillStyle = baked === 5
+            ? Baked.Plate
+            : Color.Plate;
+         if (cutted === 5) {
+            ctx.arc(x - 5, y, 20, Math.PI*.5, Math.PI*1.5);
+            ctx.fill();
+            ctx.closePath();
+            ctx.beginPath();
+            ctx.arc(x + 5, y, 20, Math.PI*1.5, Math.PI*.5);
+         } else {
+            ctx.arc(x, y, 20, 0, Math.PI*2);
+         }
+         ctx.fill();
+      ctx.closePath();
+   ctx.restore();
+}
+
+const drawGreen = (
+   ctx: CanvasRenderingContext2D, 
+   x: number,
+   y: number,
+   cellSize: number,
+   cutted: number,
+   baked: number,
+) => {
+   ctx.save();
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+         ctx.strokeStyle = baked === 5
+            ? Baked.Green
+            : Color.Green;
+         if (cutted === 5) {
+            const start = x - cellSize/4;
+            const width = cellSize/4;
+            ctx.moveTo(start, y);
+            ctx.quadraticCurveTo(start + width*.25, y - 5, start + width*.5, y);
+            ctx.quadraticCurveTo(start + width*.75, y + 5, start + width, y);
+            ctx.quadraticCurveTo(start + width + width*.25, y - 5, start + width + width*.5, y);
+            ctx.quadraticCurveTo(start + width + width*.75, y + 5, start + width + width, y);
+         } else {
+            const start = x - cellSize/4;
+            const width = cellSize/2;
+            ctx.moveTo(x - cellSize/4, y);
+            ctx.quadraticCurveTo(start + width*.25, y - 5, start + width*.5, y);
+            ctx.quadraticCurveTo(start + width*.75, y + 5, start + width, y);
+         }
+         ctx.stroke();
+      ctx.closePath();
+   ctx.restore();
+}
+
+const drawItems = (drawTile, items: Thing[], cellSize: number) => {
+   const cellify = (xy: number) => xy * cellSize + cellSize/2;
    return (ctx: CanvasRenderingContext2D) => {
 
       items.forEach(item => {
-         item.is.forEach((comp: Composable, index: number) => {
-            let itemCount = item.is.length;
-            const offsetHeight = cellSize / 2;
-            const offset = itemCount === 1
-               ? 0
-               : - (index * (offsetHeight / itemCount))
+         item.is
+            .filter(comp => comp.entity === Entity.Plate)
+            .forEach((comp: Composable, index: number) => {
+               drawPlate(
+                  ctx,
+                  cellify(item.x),
+                  cellify(item.y),
+                  cellSize,
+                  comp.cutted,
+                  comp.baked,
+               ); 
+            });
+
+         item.is
+            .filter(comp => comp.entity !== Entity.Plate)
+            .forEach((comp: Composable, index: number) => {
+            const offset = + index * 5 - 3;
             switch(comp.entity) {
+               case Entity.Cheez: 
+                  drawCheez(
+                     ctx, 
+                     cellify(item.x), 
+                     cellify(item.y) + offset,
+                     cellSize,
+                     comp.cutted,
+                     comp.baked,
+                  ); 
+                  break;
                case Entity.Meat: 
                   drawMeat(
                      ctx, 
-                     item.x * cellSize, 
-                     item.y * cellSize + offset
+                     cellify(item.x), 
+                     cellify(item.y) + offset,
+                     cellSize,
+                     comp.cutted,
+                     comp.baked,
                   ); 
                   break;
                case Entity.Bun: 
                   drawBun(
                      ctx, 
-                     item.x * cellSize, 
-                     item.y * cellSize + offset
+                     cellify(item.x), 
+                     cellify(item.y) + offset,
+                     cellSize,
+                     comp.cutted,
+                     item.is.length,
+                     comp.baked,
                   ); 
                   break;
                case Entity.Green: 
                   drawGreen(
                      ctx, 
-                     item.x * cellSize, 
-                     item.y * cellSize + offset
-                  ); 
-                  break;
-               case Entity.Plate: 
-                  drawPlate(
-                     ctx, 
-                     item.x * cellSize, 
-                     item.y * cellSize + offset
+                     cellify(item.x), 
+                     cellify(item.y) + offset,
+                     cellSize,
+                     comp.cutted,
+                     comp.baked,
                   ); 
                   break;
             }

@@ -1,5 +1,4 @@
 import { h, ElFn, Sub, Pub } from '../help/lib.js';
-import drawCell from './cell/index.js';
 import drawMsgs from './msgs/index.js';
 import drawInventory from './inventory.js';
 import drawReady from './ready.js';
@@ -17,7 +16,6 @@ const draw = (
 
 	return h('div', {},
       canvas,
-      //drawCell(el),
       drawInventory(el),
       drawReady(el),
       drawNeed(el),

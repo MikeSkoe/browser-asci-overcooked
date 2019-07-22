@@ -2,14 +2,15 @@ import { makeId } from './help/utils.js';
 
 export enum Entity {
    Plate,
+   Bun,
    Floor,
    Table,
    Guy,
    Green,
    Meat,
-   Bun,
+   Cheez,
 }
-export type Item = Entity.Meat | Entity.Bun | Entity.Green | Entity.Plate;
+export type Item = Entity.Meat | Entity.Bun | Entity.Green | Entity.Plate | Entity.Cheez;
 export enum Msg {
 	FoodOnFloor,
    CuttedWith,
@@ -42,6 +43,21 @@ export interface Thing {
    id: string,
    is: Composable[],
 }
+export enum Color {
+   Bun = 'rgb(240, 180, 50)',
+   Meat = 'rgb(230, 80, 50)',
+   Green = 'rgb(130, 230, 50)',
+   Cheez = 'rgb(230, 230, 50)',
+   Plate = 'rgb(250, 250, 250)',
+}
+export enum Baked {
+   Bun = 'rgb(160, 100, 30)',
+   Meat = 'rgb(150, 40, 20)',
+   Green = 'rgb(60, 70, 10)',
+   Cheez = 'rgb(130, 130, 20)',
+   Plate = 'rgb(200, 200, 200)',
+}
+
 export enum Surface {
    Table,
    Floor,
@@ -86,7 +102,20 @@ const initialState: State = {
       interaction: Interaction.None,
       inHand: [],
    },
-   items: [],
+   items: [
+      {
+         x: 1,
+         y: 1,
+         id: 'asdf',
+         is: [
+            {
+               entity: Entity.Cheez,
+               cutted: 1,
+               baked: 1,
+            },
+         ]
+      }
+   ],
    msgs: [],
    ready: [],
    need: [

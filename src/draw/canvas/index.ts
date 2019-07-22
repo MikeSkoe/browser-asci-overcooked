@@ -34,25 +34,27 @@ const drawTile =
 }
 
 const drawBackground = (ctx: CanvasRenderingContext2D) => {
-   ctx.fillStyle = `rgb(150, 150, 150)`;
-   ctx.fillRect(0, 0, cellSize * 5, cellSize * 6);
+   ctx.save();
+      ctx.fillStyle = 'rgb(150, 150, 150)';
+      ctx.rect(0, 0, cellSize * 5, cellSize * 6);
+      ctx.fill();
+   ctx.restore();
    return ctx;
 }
+
+// TODO: everyting to line
 
 const drawCanvas = (state: State) => {
    pipe(
       drawBackground,
       drawGrid(drawTile, state.grid, cellSize),
       drawItems(drawTile, state.items, cellSize),
-      drawGuy(drawTile, state.guy, cellSize),
+      drawGuy(state.guy, cellSize),
    )(ctx);
 }
-
 const init = (sub: Sub, triggerAll) => {
    sub(['ALL'], drawCanvas);
-
    tile.onload = triggerAll;
    return canvas;
 }
-
 export default init;
