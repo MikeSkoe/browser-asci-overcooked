@@ -7,23 +7,23 @@ const drawHeat = (
    cellSize: number, 
 ) => {
    ctx.save();
-      ctx.arc(x - cellSize/4, y-10, 10, 0, Math.PI*.5, true);
+      ctx.arc(x - cellSize/5, y-10, 7, 0, Math.PI*.5, true);
       ctx.stroke();
       ctx.closePath();
       ctx.beginPath();
-      ctx.arc(x, y-10, 10, 0, Math.PI*1.3, true);
+      ctx.arc(x, y-10, 7, 0, Math.PI*1.3, true);
       ctx.stroke();
       ctx.closePath();
       ctx.beginPath();
-      ctx.arc(x + cellSize/4, y-10, 10, Math.PI*1.3, Math.PI*.5);
+      ctx.arc(x + cellSize/5, y-10, 7, Math.PI*1.3, Math.PI*.5);
       ctx.stroke();
-      ctx.lineTo(x, y);
-      ctx.moveTo(x - 14, y);
+      ctx.lineTo(x, y - 3);
+      ctx.moveTo(x - 14, y - 5);
       ctx.lineTo(x - 14, y + 10);
       ctx.moveTo(x - 14, y + 10);
       ctx.lineTo(x + 14, y + 10);
       ctx.moveTo(x + 14, y + 10);
-      ctx.lineTo(x + 14, y);
+      ctx.lineTo(x + 14, y - 4);
       ctx.stroke();
    ctx.restore();
 };

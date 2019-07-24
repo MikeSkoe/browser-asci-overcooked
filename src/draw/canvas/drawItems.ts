@@ -1,5 +1,5 @@
 import { Entity, Thing, Composable } from '../../state.js';
-import { Color, Baked } from '../../state.js';
+import { Color } from '../../state.js';
 
 type DrawFn = (x: number, y: number, comp: Composable) => void;
 interface DrawItem {
@@ -8,7 +8,7 @@ interface DrawItem {
 }
 type MakeDrawItem = (ctx: CanvasRenderingContext2D) => DrawItem;
 
-const drawMeat = (
+export const drawMeat = (
    ctx: CanvasRenderingContext2D, 
    x: number, 
    y: number, 
@@ -20,7 +20,7 @@ const drawMeat = (
       ctx.lineWidth = 2;
       ctx.beginPath();
          ctx.strokeStyle = baked === 5
-            ? Baked.Meat
+            ? Color.BakedMeat
             : Color.Meat;
          if (cutted === 5) {
             ctx.moveTo(x - cellSize/3, y);
@@ -36,7 +36,7 @@ const drawMeat = (
    ctx.restore();
 }
 
-const drawCheez = (
+export const drawCheez = (
    ctx: CanvasRenderingContext2D, 
    x: number, 
    y: number, 
@@ -48,7 +48,7 @@ const drawCheez = (
       ctx.lineWidth = 2;
       ctx.beginPath();
          ctx.strokeStyle = baked === 5
-            ? Baked.Cheez
+            ? Color.BakedCheez
             : Color.Cheez;
          if (cutted === 5) {
             ctx.moveTo(x - cellSize/4, y);
@@ -66,7 +66,7 @@ const drawCheez = (
    ctx.restore();
 }
 
-const drawBun = (
+export const drawBun = (
    ctx: CanvasRenderingContext2D, 
    x: number, 
    y: number, 
@@ -78,7 +78,7 @@ const drawBun = (
    ctx.save();
       ctx.beginPath();
          ctx.strokeStyle = baked === 5
-            ? Baked.Bun
+            ? Color.BakedBun
             : Color.Bun;
          ctx.lineWidth = 2;
          if (cutted === 5) {
@@ -95,7 +95,7 @@ const drawBun = (
    ctx.restore();
 }
 
-const drawPlate = (
+export const drawPlate = (
    ctx: CanvasRenderingContext2D, 
    x: number, 
    y: number, 
@@ -106,7 +106,7 @@ const drawPlate = (
    ctx.save();
       ctx.beginPath();
          ctx.fillStyle = baked === 5
-            ? Baked.Plate
+            ? Color.BakedPlate
             : Color.Plate;
          if (cutted === 5) {
             ctx.arc(x - 5, y, 20, Math.PI*.5, Math.PI*1.5);
@@ -122,20 +122,24 @@ const drawPlate = (
    ctx.restore();
 }
 
-const drawGreen = (
+export const drawGreen = (
    ctx: CanvasRenderingContext2D, 
    x: number,
    y: number,
    cellSize: number,
    cutted: number,
    baked: number,
+   color?: Color,
 ) => {
    ctx.save();
       ctx.lineWidth = 2;
       ctx.beginPath();
-         ctx.strokeStyle = baked === 5
-            ? Baked.Green
-            : Color.Green;
+            ctx.strokeStyle = 
+               color
+                  ? color
+               : baked === 5
+                  ? Color.BakedGreen
+                  : Color.Green;
          if (cutted === 5) {
             const start = x - cellSize/4;
             const width = cellSize/4;
@@ -155,6 +159,8 @@ const drawGreen = (
       ctx.closePath();
    ctx.restore();
 }
+
+export const escapePlate = (comp: Composable) => comp.entity !== Entity.Plate;
 
 const drawItems = (drawTile, items: Thing[], cellSize: number) => {
    const cellify = (xy: number) => xy * cellSize + cellSize/2;
@@ -206,7 +212,7 @@ const drawItems = (drawTile, items: Thing[], cellSize: number) => {
                      cellify(item.y) + offset,
                      cellSize,
                      comp.cutted,
-                     item.is.length,
+                     item.is.filter(escapePlate).length,
                      comp.baked,
                   ); 
                   break;

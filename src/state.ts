@@ -45,17 +45,15 @@ export interface Thing {
 }
 export enum Color {
    Bun = 'rgb(240, 180, 50)',
+      BakedBun = 'rgb(160, 100, 30)',
    Meat = 'rgb(230, 80, 50)',
+      BakedMeat = 'rgb(150, 40, 20)',
    Green = 'rgb(130, 230, 50)',
+      BakedGreen = 'rgb(60, 70, 10)',
    Cheez = 'rgb(230, 230, 50)',
+      BakedCheez = 'rgb(180, 180, 40)',
    Plate = 'rgb(250, 250, 250)',
-}
-export enum Baked {
-   Bun = 'rgb(160, 100, 30)',
-   Meat = 'rgb(150, 40, 20)',
-   Green = 'rgb(60, 70, 10)',
-   Cheez = 'rgb(130, 130, 20)',
-   Plate = 'rgb(200, 200, 200)',
+      BakedPlate = 'rgb(200, 200, 200)',
 }
 
 export enum Surface {
